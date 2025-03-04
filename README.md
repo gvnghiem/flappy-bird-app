@@ -19,3 +19,12 @@ This project is a recreation of Flappy Bird, where the player navigates a bird t
 - **Pygame**: Install via pip:
   ```bash
   pip install pygame
+
+  
+### Changes Made:
+1. **Features**: Added "Sound Effects" to the list, describing the audio cues.
+2. **Setup**: Updated step 2 to include the MP3 sound files with their purposes.
+3. **File Structure**: Updated to list `die.mp3`, `hit.mp3`, `flap.mp3`, and `point.mp3` instead of mp3 files.
+4. **Troubleshooting**: Added a note about sound errors specific to MP3s.
+5. **Credits**: Added a mention of [101soundboards.com](101soundboards.com) as the source of the sound effects.
+

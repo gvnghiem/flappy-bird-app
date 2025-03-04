@@ -1,8 +1,9 @@
 import pygame
 import random
 
-# Initialize Pygame
+# Initialize Pygame and mixer
 pygame.init()
+pygame.mixer.init()
 
 # Screen dimensions
 SCREEN_WIDTH = 400
@@ -44,11 +45,21 @@ except pygame.error as e:
     sprite_sheet.fill(SKY_BLUE)
     sheet_width, sheet_height = SCREEN_WIDTH, SCREEN_HEIGHT
 
+# Load sound effects (MP3 format)
+try:
+    die_sound = pygame.mixer.Sound("die.mp3")
+    hit_sound = pygame.mixer.Sound("hit.mp3")
+    flap_sound = pygame.mixer.Sound("flap.mp3")
+    point_sound = pygame.mixer.Sound("point.mp3")
+except pygame.error as e:
+    print(f"Error loading sound effects: {e}")
+    die_sound = hit_sound = flap_sound = point_sound = None
+
 # Define sprite coordinates and sizes
 BACKGROUND_X, BACKGROUND_Y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT = 0, 0, 225, 400
-PIPE_X, PIPE_Y, PIPE_WIDTH, PIPE_HEIGHT = 0, 504, 43, 250  # Adjusted to fit 800x800
+PIPE_X, PIPE_Y, PIPE_WIDTH, PIPE_HEIGHT = 0, 504, 43, 250
 BIRD_WIDTH, BIRD_HEIGHT = 34, 24
-BIRD_FRAMES = [(0, 766), (44, 766), (88, 766)]  # Confirmed three frames
+BIRD_FRAMES = [(0, 766), (44, 766), (88, 766)]
 
 # Load background
 background = load_sprite_from_sheet(
@@ -132,8 +143,12 @@ def check_collision(bird_x, bird_y, pipe_x, pipe_height):
     bottom_pipe_rect = pygame.Rect(
         pipe_x, pipe_height + PIPE_GAP, PIPE_WIDTH, SCREEN_HEIGHT - (pipe_height + PIPE_GAP))
     if bird_y < 0 or bird_y + BIRD_HEIGHT > SCREEN_HEIGHT:
+        if die_sound and (bird_y < 0 or bird_y + BIRD_HEIGHT > SCREEN_HEIGHT):
+            die_sound.play()
         return True
     if bird_rect.colliderect(top_pipe_rect) or bird_rect.colliderect(bottom_pipe_rect):
+        if hit_sound:
+            hit_sound.play()
         return True
     return False
 
@@ -173,6 +188,8 @@ while running:
                     game_state = PLAYING
                 elif game_state == PLAYING:
                     bird_velocity = FLAP_POWER
+                    if flap_sound:
+                        flap_sound.play()
                 elif game_state == GAME_OVER:
                     reset_game()
                     game_state = IDLE
@@ -222,6 +239,8 @@ while running:
             if gap_top < bird_center_y < gap_bottom:
                 score += 1
                 pipe_passed = True
+                if point_sound:
+                    point_sound.play()
 
         screen.blit(background, (0, 0))
         draw_pipe(pipe_x, pipe_height)
